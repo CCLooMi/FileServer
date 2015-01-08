@@ -1,0 +1,36 @@
+.container {
+    margin-top:  20px;
+}
+.table tbody tr td:first-child{
+    width: 95%;
+}
+.table tbody tr td:nth-last-child(1){
+    cursor: pointer;
+    vertical-align: middle;
+    text-align: center;
+}
+.table tbody tr td:nth-last-child(1):hover{
+    background-color: #dcdcdc;
+}
+.progress {
+    height: 5px;
+    margin-bottom: 0px;
+}
+.tablepanel {
+    max-height: 550px;
+    overflow-y: auto;
+}
+table {
+    word-break:break-all;
+    word-wrap:break-word;
+}
+.table {
+    margin-bottom: 0px;
+}
+.panel-footer {
+    text-align: right;
+}
+.well {
+    max-height: 600px;
+    overflow-y: auto;
+}

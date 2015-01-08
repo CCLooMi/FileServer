@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>FileUpload</title>
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-theme.css" rel="stylesheet">
+    <link href="css/fileupload.css" rel="stylesheet">
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/html5.websocket.fileupload-2.0.0.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="fileup"></div>
+</div>
+</body>
+<script>
+    $('.fileup').fileuploader({
+        concurrentHash:2,
+        concurrentUpload:2,
+        debugMode:false,
+        wsuri:'ws://localhost:8080/FileUploadServer_2/websocket/fileup'
+    });
+</script>
+</html>
