@@ -28,6 +28,7 @@
             .on({
                 click: $.proxy(this.click,this)
             });
+        this.attachDragEvents();
         this.initWS();
     };
     FileUploader.prototype={
@@ -80,6 +81,9 @@
                 worker.addEventListener('message', this.handleHashWorkerEvent(f));
                 UPGlobal.workers[f.name]=worker;//记录每个文件的worker用于后面清除worker
                 this.doHashWork(f,worker);
+            }else{
+                //Hash计算完毕要恢复此值
+                this.concurrentHashCurrent=0;
             }
         },
         startHashFile:function(){
@@ -197,10 +201,11 @@
             };
         },
         click:function(e){
-            var target=$(e.target).closest('button,td');
+            var target=$(e.target).closest('button,td,.drop-zone');
             var addfile=this.panel.find('#addfile');
             var removefile=this.panel.find('tbody tr td:nth-last-child(1)');
-            if(target.is(addfile)){
+            var dropZone=this.panel.find('.drop-zone');
+            if(target.is(addfile)||target.is(dropZone)){
                 $('#files').trigger('click');
             }else if(target.is(removefile)){
                 var $this=target;
@@ -253,8 +258,20 @@
                 }
             }
         },
+        attachDragEvents:function(){
+            var tablepanel=document.getElementsByClassName('tablepanel');
+            tablepanel[0].addEventListener('dragover', $.proxy(this.dragOver,this));
+            tablepanel[0].addEventListener('drop', $.proxy(this.fileSelect,this));
+        },
+        dragOver:function(e){
+            e.stopPropagation();
+            e.preventDefault();
+        },
         fileSelect:function(e){
-            var files= e.target.files;
+            e.stopPropagation();
+            e.preventDefault();
+            this.hideDropzone();
+            var files= e.dataTransfer ? e.dataTransfer.files : e.target.files;
             var output=[];
             for(var i=0,f;f=files[i];i++){
                 if(!UPGlobal.allFiles[f.name]){
@@ -280,6 +297,9 @@
                 }
             }
             return r;
+        },
+        hideDropzone:function(){
+            $('.drop-zone').slideUp(500);
         },
         log:function(message){
             if(this.debugMode){
@@ -344,7 +364,8 @@
             'BB':Math.pow(10,27)
         },
         headTemplate:'<div class="panel-heading"><h4>HTML5 fileupload</h4></div>',
-        contTemplate:'<div class="tablepanel panel-body"><table class="table table-hover"><tbody></tbody></table></div>',
+        contTemplate:'<div class="tablepanel panel-body"><table class="table table-hover"><tbody></tbody></table>' +
+        '<div class="drop-zone"><h1>Drop files here or click for select</h1>将文件拖放到这里或点击这里</div></div>',
         footTemplate:'<div class="panel-footer"><div class="btn-group">' +
         '<button class="btn btn-default btn-danger" id="addfile"><span class="glyphicon glyphicon-plus"></span>添加</button>' +
         '</div></div>',
