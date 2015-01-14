@@ -20,8 +20,6 @@ import com.config.ServerConfigEnum;
  */
 public class SlicedInfo implements Serializable {
 	private static final long serialVersionUID = -297968415967865689L;
-	private static final String basePath=ServerConfigEnum.config.getSavePath();
-	private static final String suFix=".si";
 	
 	private long blobSize;
 	private byte[] blobCompleteDetail;
@@ -29,11 +27,13 @@ public class SlicedInfo implements Serializable {
 	private long lastBlobSize;
 	private String fileId;
 	private File file;
-	private long currentFileSize;
+	private long currentFileSize=0;
+	private long fileSize;
+	private float completePercent;
 	
 	
-	private SlicedInfo(FileInfo fileInfo,long blobSize){
-		this.blobSize=blobSize;
+	private SlicedInfo(FileInfo fileInfo){
+		this.blobSize=ServerConfigEnum.config.getBlobSize();
 		int n=0;
 		if(fileInfo.getFileSize()%this.blobSize==0){
 			n=(int) (fileInfo.getFileSize()/this.blobSize);
@@ -49,39 +49,21 @@ public class SlicedInfo implements Serializable {
 			this.blobCompleteDetail[i]=0;
 		}
 		this.fileId=fileInfo.getFileId();
-		this.file=new File(basePath+this.fileId+suFix);
+		this.file=new File(ServerConfigEnum.config.getSavePath()+this.fileId+ServerConfigEnum.config.getSuFix());
+		this.fileSize=fileInfo.getFileSize();
+		this.completePercent=(float)currentFileSize/(float)fileSize;
 	}
-	private void blobLock(int index){
-		this.blobCompleteDetail[index]=-1;
-	}
-	public void blobComplete(int index){
-		this.blobCompleteDetail[index]=1;
-	}
-	public void blobUnComplete(int index){
-		this.blobCompleteDetail[index]=0;
-	}
-	public synchronized long currentFileSizeAdd(long a){
-		this.currentFileSize+=a;
-		return this.currentFileSize;
-	}
-	public synchronized long currentFileSizeMinus(long a){
-		this.currentFileSize-=a;
-		return this.currentFileSize;
-	}
-	public void saveToDisk(){
-//		System.out.println("Save blob info to disk.");
-		this.doSerializableToDisk();
-	}
-	public static SlicedInfo getInstance(FileInfo fileInfo,long blobSize){
+	public static SlicedInfo getInstance(FileInfo fileInfo){
 		SlicedInfo slicedInfo=null;
-		File file=new File(basePath+fileInfo.getFileId()+suFix);
+		File file=new File(ServerConfigEnum.config.getSavePath()+fileInfo.getFileId()+".si");
 		if(file.exists()){
 			slicedInfo=unSerializableFromDisk(file);
 		}else{
-			slicedInfo=new SlicedInfo(fileInfo, blobSize).doSerializableToDisk();
+			slicedInfo=new SlicedInfo(fileInfo).doSerializableToDisk();
 		}
 		return slicedInfo;
 	}
+
 	private SlicedInfo doSerializableToDisk(){
 		try{
 			FileOutputStream out=new FileOutputStream(this.file);
@@ -108,6 +90,25 @@ public class SlicedInfo implements Serializable {
 		}
 		return slicedInfo;
 	}
+	private void blobLock(int index){
+		this.blobCompleteDetail[index]=-1;
+	}
+	public void blobComplete(int index){
+		this.blobCompleteDetail[index]=1;
+	}
+	public void blobUnComplete(int index){
+		this.blobCompleteDetail[index]=0;
+	}
+	public synchronized SlicedInfo currentFileSizeAdd(long a){
+		this.currentFileSize+=a;
+		this.completePercent=(float)currentFileSize/(float)fileSize;
+		return this;
+	}
+	public synchronized SlicedInfo currentFileSizeMinus(long a){
+		this.currentFileSize-=a;
+		this.completePercent=(float)currentFileSize/(float)fileSize;
+		return this;
+	}
 	public UploadCommand getUploadCommandRandom(){
 		UploadCommand uc=new UploadCommand();
 		uc.setFileId(this.fileId);
@@ -118,6 +119,7 @@ public class SlicedInfo implements Serializable {
 				uc.setIndexStart(0);
 				uc.setIndexEnd(this.lastBlobSize);
 				uc.setBlobSize(this.lastBlobSize);
+				uc.setCompletePercent(this.completePercent);
 				this.blobLock(0);
 			}else{
 				uc.setIndex(-1);
@@ -134,12 +136,14 @@ public class SlicedInfo implements Serializable {
 					uc.setIndexStart(ranIndex*this.blobSize);
 					uc.setIndexEnd(uc.getIndexStart()+this.lastBlobSize);
 					uc.setBlobSize(this.lastBlobSize);
+					uc.setCompletePercent(this.completePercent);
 					this.blobLock(ranIndex);
 				}else{
 					uc.setIndex(ranIndex);
 					uc.setIndexStart(ranIndex*this.blobSize);
 					uc.setIndexEnd(uc.getIndexStart()+this.blobSize);
 					uc.setBlobSize(this.blobSize);
+					uc.setCompletePercent(this.completePercent);
 					this.blobLock(ranIndex);
 				}
 			}else{
@@ -152,6 +156,7 @@ public class SlicedInfo implements Serializable {
 							uc.setIndexStart(ranIndex*this.blobSize);
 							uc.setIndexEnd(uc.getIndexStart()+this.blobSize);
 							uc.setBlobSize(this.blobSize);
+							uc.setCompletePercent(this.completePercent);
 							this.blobLock(ranIndex);
 							break;
 						}
@@ -162,6 +167,7 @@ public class SlicedInfo implements Serializable {
 							uc.setIndexStart(ranIndex*this.blobSize);
 							uc.setIndexEnd(uc.getIndexStart()+this.lastBlobSize);
 							uc.setBlobSize(this.lastBlobSize);
+							uc.setCompletePercent(this.completePercent);
 							this.blobLock(ranIndex);
 							break;
 						}else{
@@ -169,6 +175,7 @@ public class SlicedInfo implements Serializable {
 							uc.setIndexStart(ranIndex*this.blobSize);
 							uc.setIndexEnd(uc.getIndexStart()+this.blobSize);
 							uc.setBlobSize(this.blobSize);
+							uc.setCompletePercent(this.completePercent);
 							this.blobLock(ranIndex);
 							break;
 						}
@@ -213,12 +220,6 @@ public class SlicedInfo implements Serializable {
 	public void setFileId(String fileId) {
 		this.fileId = fileId;
 	}
-	public File getFile() {
-		return file;
-	}
-	public void setFile(File file) {
-		this.file = file;
-	}
 	public long getCurrentFileSize() {
 		return currentFileSize;
 	}
@@ -228,10 +229,23 @@ public class SlicedInfo implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	public static String getBasepath() {
-		return basePath;
+	public File getFile() {
+		return file;
 	}
-	public static String getSufix() {
-		return suFix;
+	public void setFile(File file) {
+		this.file = file;
 	}
+	public long getFileSize() {
+		return fileSize;
+	}
+	public void setFileSize(long fileSize) {
+		this.fileSize = fileSize;
+	}
+	public float getCompletePercent() {
+		return completePercent;
+	}
+	public void setCompletePercent(float completePercent) {
+		this.completePercent = completePercent;
+	}
+	
 }

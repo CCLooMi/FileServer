@@ -1,8 +1,12 @@
 package com.core;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -29,6 +33,8 @@ public class FileTarget {
 	private String fileName;
 	
 	private File file;
+	private File siFile;
+	private File tempFile;
 	private RandomAccessFile raFile;
 	private FileChannel fileChannel;
 	
@@ -39,16 +45,27 @@ public class FileTarget {
 		this.currentFileUploaders=new CopyOnWriteArraySet<FileServer>();
 		this.setFileInfo(fileInfo);
 		this.openFileWriteAccessChannel();
+//		System.out.println("Create FileTarget successed.: "+fileInfo.getFileId());
 	}
-	
+	public static boolean isFileOK(FileInfo fileInfo){
+		boolean isOK=false;
+		String fileName=fileInfo.getFileId()+"."+fileInfo.getFileName().substring(fileInfo.getFileName().lastIndexOf(".")+1);
+		if(new File(ServerConfigEnum.config.getSavePath()+fileName).exists()||fileInfo.getFileSize()==0){
+			isOK=true;
+		}
+		return isOK;
+	}
 	public FileInfo getFileInfo() {
 		return fileInfo;
 	}
 	public void setFileInfo(FileInfo fileInfo) {
 		this.fileInfo = fileInfo;
 		this.fileName=this.fileInfo.getFileId()+"."+this.fileInfo.getFileName().substring(this.fileInfo.getFileName().lastIndexOf(".")+1);
-		if(this.slicedInfo==null){
-			this.slicedInfo=SlicedInfo.getInstance(fileInfo, ServerConfigEnum.config.getBlobSize());
+		this.file=new File(this.basePath+this.fileName);
+		this.siFile=new File(this.basePath+this.fileInfo.getFileId()+ServerConfigEnum.config.getSuFix());
+		this.tempFile=new File(this.basePath+this.fileInfo.getFileId()+".temp");
+		if(!this.file.exists()&&this.slicedInfo==null){
+			this.slicedInfo=SlicedInfo.getInstance(fileInfo);
 		}
 	}
 	public SlicedInfo getSlicedInfo() {
@@ -82,22 +99,14 @@ public class FileTarget {
 		this.currentFileUploaders.add(fs);
 	}
 	public void removeUploader(FileServer fs){
-		if(this.currentFileUploaders.contains(fs)){
-			this.currentFileUploaders.remove(fs);
-		}
+		this.currentFileUploaders.remove(fs);
 	}
-	public UploadCommand getUploadCommand(){
-		UploadCommand command=null;
-		if(this.slicedInfo!=null){
-			command=this.slicedInfo.getUploadCommandRandom();
-			command.setCompletePercent(this.completePercent);
+	public synchronized UploadCommand getUploadCommand(){
+		UploadCommand command;
+		if(this.slicedInfo==null){
+			command=UploadCommand.getSucccessCommand(this.fileInfo.getFileId());
 		}else{
-			command=new UploadCommand();
-			command.setFileId(this.getFileInfo().getFileId());
-			command.setIndexStart(-1);
-			command.setIndexEnd(-1);
-			command.setIndex(-1);
-			command.setCompletePercent(1);
+			command=this.slicedInfo.getUploadCommandRandom();
 		}
 		return command;
 	}
@@ -106,7 +115,7 @@ public class FileTarget {
 	 * @param command
 	 * @return
 	 */
-	public FileTarget saveByteBuffer(ByteBuffer bb,UploadCommand command){
+	public synchronized FileTarget saveByteBuffer(ByteBuffer bb,UploadCommand command){
 		if(command.getIndexStart()!=-1){
 			try {
 				this.fileChannel.write(bb, command.getIndexStart());
@@ -114,8 +123,7 @@ public class FileTarget {
 				e1.printStackTrace();
 			}
 			this.slicedInfo.blobComplete(command.getIndex());
-			long currentFileSize=this.slicedInfo.currentFileSizeAdd(command.getBlobSize());
-			this.completePercent=(float)currentFileSize/(float)this.fileInfo.getFileSize();
+			this.completePercent=this.slicedInfo.currentFileSizeAdd(command.getBlobSize()).getCompletePercent();
 			if(this.completePercent>=1){
 				this.fileUploadComplete();
 			}
@@ -123,9 +131,8 @@ public class FileTarget {
 		return this;
 	}
 	public void openFileWriteAccessChannel(){
-		this.file=new File(this.basePath+this.fileInfo.getFileId()+".temp");
 		try {
-			this.raFile=new RandomAccessFile(file, "rw");
+			this.raFile=new RandomAccessFile(this.tempFile, "rw");
 			this.raFile.setLength(this.fileInfo.getFileSize());
 			this.fileChannel=this.raFile.getChannel();
 		} catch (FileNotFoundException e) {
@@ -147,9 +154,9 @@ public class FileTarget {
 //		System.out.println("File upload complete.");
 		this.closeFileWriteAccessChannel();
 //		System.out.println("Close file access channel success.");
-		this.file.renameTo(new File(this.basePath+this.fileName));
+		this.tempFile.renameTo(this.file);
 //		System.out.println("Renam file success.");
-		new File(this.basePath+this.fileInfo.getFileId()+".si").delete();
+		this.siFile.delete();
 //		System.out.println("Delete si file success.");
 	}
 }

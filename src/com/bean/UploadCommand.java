@@ -13,6 +13,16 @@ public class UploadCommand {
 	private long indexEnd;
 	private long blobSize;
 	private float completePercent;
+	public static UploadCommand getSucccessCommand(String fileId){
+		UploadCommand uc=new UploadCommand();
+		uc.setBlobSize(-1);
+		uc.setCompletePercent(1);
+		uc.setFileId(fileId);
+		uc.setIndex(-1);
+		uc.setIndexEnd(-1);
+		uc.setIndexStart(-1);
+		return uc;
+	}
 	public String getFileId() {
 		return fileId;
 	}

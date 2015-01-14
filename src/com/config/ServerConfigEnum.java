@@ -9,6 +9,7 @@ public enum ServerConfigEnum {
 	config;
 	private String savePath;
 	private int blobSize;
+	private String suFix;
 	private ServerConfigEnum(){
 		String fname=this.getClass().getResource("config.properties").getPath().substring(1);
 		Properties properties=new Properties();
@@ -19,6 +20,7 @@ public enum ServerConfigEnum {
 			inStream.close();
 			this.savePath=properties.getProperty("savePath");
 			this.blobSize=Integer.valueOf(properties.getProperty("blobSize"));
+			this.suFix=".si";
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -34,6 +36,12 @@ public enum ServerConfigEnum {
 	}
 	public void setBlobSize(int blobSize) {
 		this.blobSize = blobSize;
+	}
+	public String getSuFix() {
+		return suFix;
+	}
+	public void setSuFix(String suFix) {
+		this.suFix = suFix;
 	}
 	
 }
