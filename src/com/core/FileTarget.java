@@ -1,12 +1,8 @@
 package com.core;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -124,6 +120,7 @@ public class FileTarget {
 			}
 			this.slicedInfo.blobComplete(command.getIndex());
 			this.completePercent=this.slicedInfo.currentFileSizeAdd(command.getBlobSize()).getCompletePercent();
+			System.out.println(this.completePercent);
 			if(this.completePercent>=1){
 				this.fileUploadComplete();
 			}

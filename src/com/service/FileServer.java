@@ -1,9 +1,7 @@
 package com.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +17,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+
 import com.bean.FileInfo;
 import com.bean.UploadCommand;
 import com.config.ServerConfigEnum;
@@ -27,6 +26,7 @@ import com.core.FileTarget;
 @ServerEndpoint("/websocket/fileup")
 public class FileServer {
 	private static Map<String,FileTarget>fileTargetMap=new HashMap<String, FileTarget>();
+	private boolean isCommandComplete=true;
 	private UploadCommand uploadCommand;
 	private Session session;
 	private FileTarget fileTarget;
@@ -39,7 +39,7 @@ public class FileServer {
 	}
 	@OnClose
 	public void onClose(){
-		
+		cancelCommand();
 	}
 	@OnMessage
 	public void onTextMessage(String message){
@@ -54,6 +54,10 @@ public class FileServer {
 		t.printStackTrace();
 	}
 	private void dataProcessing(String message){
+		if(!this.isCommandComplete){
+			cancelCommand();
+			System.out.println("command没有完成,已回滚.");
+		}
 		try {
 			JsonParser jp=new JsonFactory().createJsonParser(message);
 			FileInfo fileInfo=objMapper.readValue(jp, FileInfo.class);
@@ -63,11 +67,14 @@ public class FileServer {
 		}
 	}
 	private void dataProcessing(ByteBuffer bb){
+		this.isCommandComplete=true;
 		this.uploadCommand=this.fileTarget.saveByteBuffer(bb, this.uploadCommand).getUploadCommand();
 		response(this.uploadCommand);
+		this.isCommandComplete=false;
 		if(this.uploadCommand.getCompletePercent()==1){
 //			System.out.println("文件上完成");
 			fileUloadComplete();
+			this.isCommandComplete=true;
 		}
 	}
 	private void response(String data){
@@ -110,6 +117,25 @@ public class FileServer {
 			}
 		}
 		response(this.uploadCommand);
+		this.isCommandComplete=false;
+	}
+	private void cancelCommand(){
+		if(this.fileTarget!=null&&this.uploadCommand!=null){
+			this.fileTarget.removeUploader(this);
+			if(this.uploadCommand.getCompletePercent()!=1){
+				this.fileTarget.getSlicedInfo().blobUnComplete(this.uploadCommand.getIndex());
+				this.fileTarget.getSlicedInfo().currentFileSizeMinus(this.uploadCommand.getBlobSize());
+				//如果当前没有上传该文件的客户端则释放相应资源并保存进度到磁盘同时也删除map中该文件的target
+				if(this.fileTarget.getCurrentFileUploaders().isEmpty()){
+					this.fileTarget.getSlicedInfo().saveToDisk();
+					this.fileTarget.closeFileWriteAccessChannel();
+					fileTargetMap.remove(this.fileTarget.getFileInfo().getFileId());
+				}
+			}else{
+				this.uploadCommand=null;
+			}
+			this.fileTarget=null;
+		}//if end
 	}
 	private void fileUloadComplete(){
 //		System.out.println("将本FileServer从文件uploader中移除。");
