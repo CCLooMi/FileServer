@@ -55,7 +55,7 @@ public class SlicedInfo implements Serializable {
 	}
 	public static SlicedInfo getInstance(FileInfo fileInfo){
 		SlicedInfo slicedInfo=null;
-		File file=new File(ServerConfigEnum.config.getSavePath()+fileInfo.getFileId()+".si");
+		File file=new File(ServerConfigEnum.config.getSavePath()+fileInfo.getFileId()+ServerConfigEnum.config.getSuFix());
 		if(file.exists()){
 			slicedInfo=unSerializableFromDisk(file);
 		}else{
@@ -63,7 +63,9 @@ public class SlicedInfo implements Serializable {
 		}
 		return slicedInfo;
 	}
-
+	public void saveToDisk(){
+		this.doSerializableToDisk();
+	}
 	private SlicedInfo doSerializableToDisk(){
 		try{
 			FileOutputStream out=new FileOutputStream(this.file);
