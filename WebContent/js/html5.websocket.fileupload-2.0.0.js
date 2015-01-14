@@ -169,13 +169,17 @@
         doUploadByCommand:function(ws,command){
             var fileName=UPGlobal.fileIdToFileNameMap[command.fileId];
             var f=UPGlobal.allFiles[fileName];
-            var blob= f.slice(command.indexStart,command.indexEnd);
-            var reader=new FileReader();
-            reader.onload=function(e){
+            if(f){
+                var blob= f.slice(command.indexStart,command.indexEnd);
+                var reader=new FileReader();
+                reader.onload=function(e){
 //            this.log('Sending data: '+blob.size);
-                ws.send(e.target.result);
-            };
-            reader.readAsArrayBuffer(blob);
+                    ws.send(e.target.result);
+                };
+                reader.readAsArrayBuffer(blob);
+            }else{
+                this.uploadNextFile(ws);
+            }
         },
         handleHashWorkerEvent:function(f){
             var that=this;
@@ -237,8 +241,7 @@
                 case 3:
                     //alert('onUploading');
                     //delete file from filesUploaded ??不需要，这个时候还没有放入fileHasHashed中
-                    this.removeFileFromArray(fileName);
-                    //send cancel command
+                    this.removeFileFromArray(fileName);//移除之后通过command上传将找不到file而终止文件上传。并自动开始上传下一个文件
                     break;
                 case 4:
                     //alert('onSuccess');
