@@ -124,7 +124,6 @@ public class FileServer {
 			this.fileTarget.removeUploader(this);
 			if(this.uploadCommand.getCompletePercent()!=1){
 				this.fileTarget.getSlicedInfo().blobUnComplete(this.uploadCommand.getIndex());
-				this.fileTarget.getSlicedInfo().currentFileSizeMinus(this.uploadCommand.getBlobSize());
 				//如果当前没有上传该文件的客户端则释放相应资源并保存进度到磁盘同时也删除map中该文件的target
 				if(this.fileTarget.getCurrentFileUploaders().isEmpty()){
 					this.fileTarget.getSlicedInfo().saveToDisk();
