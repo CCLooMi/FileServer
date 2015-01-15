@@ -117,7 +117,11 @@ public class FileServer {
 			}
 		}
 		response(this.uploadCommand);
-		this.isCommandComplete=false;
+		if(this.uploadCommand.getCompletePercent()==1){
+			this.isCommandComplete=true;
+		}else{
+			this.isCommandComplete=false;
+		}
 	}
 	private void cancelCommand(){
 		if(this.fileTarget!=null&&this.uploadCommand!=null){
