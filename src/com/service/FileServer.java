@@ -1,4 +1,4 @@
-package com.service;
+ï»¿package com.service;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -56,7 +56,7 @@ public class FileServer {
 	private void dataProcessing(String message){
 		if(!this.isCommandComplete){
 			cancelCommand();
-			System.out.println("commandÃ»ÓĞÍê³É,ÒÑ»Ø¹ö.");
+			System.out.println("commandæ²¡æœ‰å®Œæˆ,å·²å›æ»š.");
 		}
 		try {
 			JsonParser jp=new JsonFactory().createJsonParser(message);
@@ -72,7 +72,7 @@ public class FileServer {
 		response(this.uploadCommand);
 		this.isCommandComplete=false;
 		if(this.uploadCommand.getCompletePercent()==1){
-//			System.out.println("ÎÄ¼şÉÏÍê³É");
+//			System.out.println("æ–‡ä»¶ä¸Šå®Œæˆ");
 			fileUloadComplete();
 			this.isCommandComplete=true;
 		}
@@ -99,19 +99,19 @@ public class FileServer {
 	private void sendFirstUploadCommand(FileInfo fileInfo){
 		synchronized (fileTargetMap) {
 			if(FileTarget.isFileOK(fileInfo)){
-//				System.out.println("ÒÑ´æÔÚ£¬ÎŞĞèÔÙ´ÎÉÏ´«_: "+fileInfo.getFileName());
+//				System.out.println("å·²å­˜åœ¨ï¼Œæ— éœ€å†æ¬¡ä¸Šä¼ _: "+fileInfo.getFileName());
 				this.uploadCommand=UploadCommand.getSucccessCommand(fileInfo.getFileId());
 			}else{
 				this.fileTarget=FileServer.fileTargetMap.get(fileInfo.getFileId());
 				if(this.fileTarget==null){
-//					System.out.println("µÚÒ»´ÎÉÏ´«_: "+fileInfo.getFileName());
+//					System.out.println("ç¬¬ä¸€æ¬¡ä¸Šä¼ _: "+fileInfo.getFileName());
 					this.fileTarget=new FileTarget(fileInfo);
 					this.fileTarget.addUploader(this);
 					FileServer.fileTargetMap.put(fileInfo.getFileId(), this.fileTarget);
 				}
 //				else{
-					//·ÖÁ½ÖÖÇé¿ö£¬Ò»ÖÖÊÇÃ»ÓĞÕıÔÚÉÏ´«µÄ¿Í»§¶Ë£¬ÁíÒ»ÖÖÊÇÓĞÕıÔÚÉÏ´«µÄ¿Í»§¶Ë¡£
-//					System.out.println("¶ÏµãĞø´«_: "+fileInfo.getFileName());
+					//åˆ†ä¸¤ç§æƒ…å†µï¼Œä¸€ç§æ˜¯æ²¡æœ‰æ­£åœ¨ä¸Šä¼ çš„å®¢æˆ·ç«¯ï¼Œå¦ä¸€ç§æ˜¯æœ‰æ­£åœ¨ä¸Šä¼ çš„å®¢æˆ·ç«¯ã€‚
+//					System.out.println("æ–­ç‚¹ç»­ä¼ _: "+fileInfo.getFileName());
 //				}
 				this.uploadCommand=this.fileTarget.getUploadCommand();
 			}
@@ -129,7 +129,7 @@ public class FileServer {
 			if(this.uploadCommand.getCompletePercent()!=1){
 				this.fileTarget.getSlicedInfo().blobUnComplete(this.uploadCommand.getIndex());
 				this.isCommandComplete=true;
-				//Èç¹ûµ±Ç°Ã»ÓĞÉÏ´«¸ÃÎÄ¼şµÄ¿Í»§¶ËÔòÊÍ·ÅÏàÓ¦×ÊÔ´²¢±£´æ½ø¶Èµ½´ÅÅÌÍ¬Ê±Ò²É¾³ımapÖĞ¸ÃÎÄ¼şµÄtarget
+				//å¦‚æœå½“å‰æ²¡æœ‰ä¸Šä¼ è¯¥æ–‡ä»¶çš„å®¢æˆ·ç«¯åˆ™é‡Šæ”¾ç›¸åº”èµ„æºå¹¶ä¿å­˜è¿›åº¦åˆ°ç£ç›˜åŒæ—¶ä¹Ÿåˆ é™¤mapä¸­è¯¥æ–‡ä»¶çš„target
 				if(this.fileTarget.getCurrentFileUploaders().isEmpty()){
 					this.fileTarget.getSlicedInfo().saveToDisk();
 					this.fileTarget.closeFileWriteAccessChannel();
@@ -142,10 +142,10 @@ public class FileServer {
 		}//if end
 	}
 	private void fileUloadComplete(){
-//		System.out.println("½«±¾FileServer´ÓÎÄ¼şuploaderÖĞÒÆ³ı¡£");
+//		System.out.println("å°†æœ¬FileServerä»æ–‡ä»¶uploaderä¸­ç§»é™¤ã€‚");
 		this.fileTarget.removeUploader(this);
 		if(this.fileTarget.getCurrentFileUploaders().isEmpty()){
-//			System.out.println("µ±Ç°ÎÄ¼şÃ»ÓĞÉÏ´«¿Í»§¶Ë£¬´ÓmapÖĞÒÆ³ı¸ÃÎÄ¼şµÄFileTarget¡£");
+//			System.out.println("å½“å‰æ–‡ä»¶æ²¡æœ‰ä¸Šä¼ å®¢æˆ·ç«¯ï¼Œä»mapä¸­ç§»é™¤è¯¥æ–‡ä»¶çš„FileTargetã€‚");
 			fileTargetMap.remove(this.fileTarget.getFileInfo().getFileId());
 		}
 	}

@@ -1,4 +1,4 @@
-package com.config;
+ï»¿package com.config;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +13,7 @@ public class ServerConfig implements ServerApplicationConfig {
 	public Set<Class<?>> getAnnotatedEndpointClasses(Set<Class<?>> scanned) {
 		 Set<Class<?>> results = new HashSet<>();
 	        for (Class<?> clazz : scanned) {
-	        	//×¢ÒâcomºóÃæ¼Ó.µÄÎÊÌâ¡£
+	        	//æ³¨æ„comåé¢åŠ .çš„é—®é¢˜ã€‚
 	            if (clazz.getPackage().getName().startsWith("com.service")) {
 	                results.add(clazz);
 	            }

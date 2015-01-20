@@ -1,4 +1,4 @@
-package com.core;
+ï»¿package com.core;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +14,7 @@ import com.bean.UploadCommand;
 import com.config.ServerConfigEnum;
 
 /**
- * ÎÄ¼şÇĞÆ¬ĞÅÏ¢Àà
+ * æ–‡ä»¶åˆ‡ç‰‡ä¿¡æ¯ç±»
  * @author xianjun
  *
  */

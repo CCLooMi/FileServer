@@ -1,6 +1,6 @@
-package com.bean;
+锘縫ackage com.bean;
 /**
- * 待上传文件基本信息类
+ * 寰呬笂浼犳枃浠跺熀鏈俊鎭被
  * @author xianjun
  *
  */

@@ -1,4 +1,4 @@
-package com.core;
+ï»¿package com.core;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,17 +15,17 @@ import com.config.ServerConfigEnum;
 import com.service.FileServer;
 
 public class FileTarget {
-	/**ÉÏ´«ÎÄ¼ş»ù±¾Ä¿Â¼*/
+	/**ä¸Šä¼ æ–‡ä»¶åŸºæœ¬ç›®å½•*/
 	private final String basePath=ServerConfigEnum.config.getSavePath();
-	/**ÉÏ´«ÎÄ¼şĞÅÏ¢*/
+	/**ä¸Šä¼ æ–‡ä»¶ä¿¡æ¯*/
 	private FileInfo fileInfo;
-	/**ÉÏ´«ÎÄ¼ş·ÖÆ¬ĞÅÏ¢*/
+	/**ä¸Šä¼ æ–‡ä»¶åˆ†ç‰‡ä¿¡æ¯*/
 	private SlicedInfo slicedInfo;
-	/**ËùÓĞÉÏ´«¸ÃÎÄ¼şµÄ¿Í»§¶Ë*/
+	/**æ‰€æœ‰ä¸Šä¼ è¯¥æ–‡ä»¶çš„å®¢æˆ·ç«¯*/
 	private Set<FileServer>currentFileUploaders;
-	/**ÎÄ¼şÉÏ´«½ø¶È*/
+	/**æ–‡ä»¶ä¸Šä¼ è¿›åº¦*/
 	private float completePercent=0;
-	/**·şÎñÆ÷¶ËÎÄ¼şÃû*/
+	/**æœåŠ¡å™¨ç«¯æ–‡ä»¶å*/
 	private String fileName;
 	
 	private File file;
@@ -107,7 +107,7 @@ public class FileTarget {
 		return command;
 	}
 	/**
-	 * ±£´æÊı¾İ
+	 * ä¿å­˜æ•°æ®
 	 * @param command
 	 * @return
 	 */
@@ -120,7 +120,6 @@ public class FileTarget {
 			}
 			this.slicedInfo.blobComplete(command.getIndex());
 			this.completePercent=this.slicedInfo.currentFileSizeAdd(command.getBlobSize()).getCompletePercent();
-			System.out.println(this.completePercent);
 			if(this.completePercent>=1){
 				this.fileUploadComplete();
 			}
