@@ -11,7 +11,7 @@ public enum ServerConfigEnum {
 	private int blobSize;
 	private String suFix;
 	private ServerConfigEnum(){
-		String fname=this.getClass().getResource("config.properties").getPath().substring(1);
+		String fname=this.getClass().getResource("config.properties").getPath();
 		Properties properties=new Properties();
 		InputStream inStream;
 		try {
