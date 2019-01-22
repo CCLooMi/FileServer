@@ -1,2 +1,8 @@
-# FileUploadServer_2
-用HTML5的websocket技术实现的文件上传，支持断点续传。
+# FileServer
+用HTML5的websocket技术实现的文件上传服务
+1.支持断点续传
+2.支持秒传
+3.连接断开或异常自动重连，自动继续断点上传
+4.同一个文件上传的客户端越多上传越快
+5.支持超大文件上传
+6.图片支持上传到zimg目录（非windows平台）
