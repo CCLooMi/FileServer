@@ -188,9 +188,9 @@ public class FileTarget implements CommandType{
 			if(Config.isZimgTypes(suffix)) {
 				String zpath=Config.getConfig("server.file.zimg.path","");
 				if(zpath.charAt(0)=='/') {
-					file=Paths.getFile(zpath,getFilePath(id),".0*0"+end);
+					file=Paths.getFile(zpath,getFilePath(id),"0*0"+end);
 				}else {
-					file=Paths.getUserDirFile(zpath,getFilePath(id),".0*0"+end);
+					file=Paths.getUserDirFile(zpath,getFilePath(id),"0*0"+end);
 				}
 			}else {
 				if(savePath.charAt(0)=='/') {
