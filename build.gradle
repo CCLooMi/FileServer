@@ -1,4 +1,4 @@
-group "ccloomi.com"
+group "com.ccloomi"
 version '1.0'
 def artifactId='fileServer'
 
