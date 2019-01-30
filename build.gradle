@@ -13,9 +13,9 @@ allprojects {
 	}
 }
 dependencies {
-        def jacksonVersion		= "2.+"
+        def jacksonVersion			= "2.+"
 		def logbackVersion		= "1.2.+"
-		def slf4jVersion		= "1.7.+"
+		def slf4jVersion				= "1.7.+"
 		def springBootVersion	= "2.+"
     compile (
 		["ch.qos.logback:logback-access:$logbackVersion"],
