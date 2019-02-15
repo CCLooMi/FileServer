@@ -29,7 +29,7 @@ public class FileTarget implements CommandType{
 	private String suffix;
 	private String type;
 	private long size;
-	private byte[] bSet;
+	private BSet bSet;
 	//bSet开始检查位置
 	private int iStart=0;
 	private long completeFileSize=0;
@@ -46,20 +46,21 @@ public class FileTarget implements CommandType{
 		this.type=(String) fileInfo.get("type");
 		this.size=new BigDecimal( fileInfo.get("size").toString()).longValue();
 		
-		this.bSet=RocksDbUtil.get(id);
-		if(null!=bSet) {
+		byte[]bs=RocksDbUtil.get(id);
+		if(null!=bs) {
+			this.bSet=new BSet(bs);
 			//查找iStart位置
-			for(int i=0;i<bSet.length;i++) {
-				if(bSet[i]!=1) {
+			for(int i=0;i<bSet.getLength();i++) {
+				if(!bSet.bit(i)) {
 					this.iStart=i;
 					break;
 				}
 			}
 			//计算上传完成size
 			long completeSize=iStart*Config.blobSize;
-			for(int i=iStart;i<bSet.length;i++) {
-				if(bSet[i]==1) {
-					if(i!=bSet.length-1) {
+			for(int i=iStart;i<bSet.getLength();i++) {
+				if(bSet.bit(i)) {
+					if(i!=bSet.getLength()-1) {
 						completeSize+=Config.blobSize;
 					}else {
 						completeSize+=this.size%Config.blobSize;
@@ -73,7 +74,7 @@ public class FileTarget implements CommandType{
 			if(this.size%Config.blobSize>0) {
 				bSetSize++;
 			}
-			this.bSet=new byte[bSetSize];
+			this.bSet=new BSet(bSetSize);
 		}
 		try {
 			this.tmpFile=fileWithEnd(this.id, this.suffix, ".tmp");
@@ -117,7 +118,7 @@ public class FileTarget implements CommandType{
 		try {
 			this.fc.write(ByteBuffer.wrap(data),command.getIndexStart());
 			addCompleteFileSize(command.blobSize());
-			this.bSet[command.getIndex()]=1;
+			this.bSet.setBit(command.getIndex());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
@@ -134,9 +135,8 @@ public class FileTarget implements CommandType{
 		return this;
 	}
 	public  FileTarget nextUploadCommand(UploadCommand command) {
-		for(int i=iStart;i<bSet.length;i++) {
-			if(bSet[i]==0) {
-				bSet[i]=-1;
+		for(int i=iStart;i<bSet.getLength();i++) {
+			if(!bSet.bit(i)) {
 				iStart=i+1;
 				long indexStart=(long)i*Config.blobSize;
 				long indexEnd=(indexStart+Config.blobSize)>size
@@ -157,14 +157,14 @@ public class FileTarget implements CommandType{
 		return this;
 	}
 	public FileTarget cancelCommand(UploadCommand command) {
-		this.bSet[command.getIndex()]=0;
+		this.bSet.unsetBit(command.getIndex());
 		if(command.getIndex()<iStart) {
 			this.iStart=command.getIndex();
 		}
 		return this;
 	}
 	public FileTarget saveStatus() {
-		RocksDbUtil.put(id, this.bSet);
+		RocksDbUtil.put(id, this.bSet.toBytes());
 		return this;
 	}
 	public void releaseResource() {
