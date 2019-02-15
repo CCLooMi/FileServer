@@ -1,4 +1,4 @@
-group "ccloomi.com"
+group "com.ccloomi"
 version '1.0'
 def artifactId='fileServer'
 
@@ -7,14 +7,15 @@ apply plugin: 'maven'
 
 allprojects {
 	repositories {
-		maven{url='http://maven.aliyun.com/nexus/content/groups/public/'}
+		maven{url='http://localhost:8081/repository/alimaven-central/'}
+		maven{url="http://maven.aliyun.com/nexus/content/groups/public/"}
 		mavenCentral()
 	}
 }
 dependencies {
-        def jacksonVersion		= "2.+"
+        def jacksonVersion			= "2.+"
 		def logbackVersion		= "1.2.+"
-		def slf4jVersion		= "1.7.+"
+		def slf4jVersion				= "1.7.+"
 		def springBootVersion	= "2.+"
     compile (
 		["ch.qos.logback:logback-access:$logbackVersion"],
