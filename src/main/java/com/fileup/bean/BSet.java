@@ -35,9 +35,9 @@ public class BSet {
 		this.bs[index>>3]^=(1<<(8-(((index>>3)<<3)^index)));
 		return this;
 	}
-//	public int getBit(int index) {
-//		return (this.bs[index>>3]&(1<<(8-(((index>>3)<<3)^index))))>0?1:0;
-//	}
+	public int getBit(int index) {
+		return (this.bs[index>>3]&(1<<(8-(((index>>3)<<3)^index))))>0?1:0;
+	}
 	public boolean bit(int index) {
 		return (this.bs[index>>3]&(1<<(8-(((index>>3)<<3)^index))))>0;
 	}
