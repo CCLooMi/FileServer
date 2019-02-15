@@ -24,7 +24,7 @@ import com.fileup.bitsyntax.function.ToBytes;
  *  邮 箱：chenios@foxmail.com
  *  日 期：2017年9月15日-下午6:03:15
  */
-public class CCBitsyntax implements CCFLib {
+public class CCBitsyntax extends CCFLib {
 	private Random random;
 	
 	// 分隔符列表,
