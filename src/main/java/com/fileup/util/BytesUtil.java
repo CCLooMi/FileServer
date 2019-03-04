@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Arrays;
 
 import org.xerial.snappy.Snappy;
 
@@ -58,21 +57,21 @@ public class BytesUtil {
 		byte[]bytes=new byte[l];
 		for(int i=0,j=0;i<hex.length();i++) {
 			switch (hex.charAt(i)) {
-			case '1':bytes[j]|=0x01;break;
-			case '2':bytes[j]|=0x02;break;
-			case '3':bytes[j]|=0x03;break;
-			case '4':bytes[j]|=0x04;break;
-			case '5':bytes[j]|=0x05;break;
-			case '6':bytes[j]|=0x06;break;
-			case '7':bytes[j]|=0x07;break;
-			case '8':bytes[j]|=0x08;break;
-			case '9':bytes[j]|=0x09;break;
-			case 'a':case 'A':bytes[j]|=0x0A;break;
-			case 'b':case 'B':bytes[j]|=0x0B;break;
-			case 'c':case 'C':bytes[j]|=0x0C;break;
-			case 'd':case 'D':bytes[j]|=0x0D;break;
-			case 'e':case 'E':bytes[j]|=0x0E;break;
-			case 'f':case 'F':bytes[j]|=0x0F;break;
+			case '1':bytes[j]|=0x10>>((i&1)<<2);break;
+			case '2':bytes[j]|=0x20>>((i&1)<<2);break;
+			case '3':bytes[j]|=0x30>>((i&1)<<2);break;
+			case '4':bytes[j]|=0x40>>((i&1)<<2);break;
+			case '5':bytes[j]|=0x50>>((i&1)<<2);break;
+			case '6':bytes[j]|=0x60>>((i&1)<<2);break;
+			case '7':bytes[j]|=0x70>>((i&1)<<2);break;
+			case '8':bytes[j]|=0x80>>((i&1)<<2);break;
+			case '9':bytes[j]|=0x90>>((i&1)<<2);break;
+			case 'a':case 'A':bytes[j]|=0xA0>>((i&1)<<2);break;
+			case 'b':case 'B':bytes[j]|=0xB0>>((i&1)<<2);break;
+			case 'c':case 'C':bytes[j]|=0xC0>>((i&1)<<2);break;
+			case 'd':case 'D':bytes[j]|=0xD0>>((i&1)<<2);break;
+			case 'e':case 'E':bytes[j]|=0xE0>>((i&1)<<2);break;
+			case 'f':case 'F':bytes[j]|=0xF0>>((i&1)<<2);break;
 			default:break;
 			}
 			j+=i&1;
@@ -321,8 +320,8 @@ public class BytesUtil {
 		return null;
 	}
 	public static void main(String[] args) {
-		byte[]bs=new byte[] {48, 55, 54, 101, 51, 99, 97, 101, 100, 55, 53, 56, 97, 49, 99, 49, 56, 99, 57, 49, 97, 48, 101, 57, 99, 97, 101, 51, 51, 54, 56, 102};
-		System.out.println(bytesToHexString(bs));
-		System.out.println(Arrays.toString(hexStringToBytes("5a44c7ba5bbe4ec867233d67e4806848")));
+		String hex=bytesToHexString("Hello world".getBytes());
+		System.out.println(hex);
+		System.out.println(new String(hexStringToBytes(hex)));
 	}
 }
