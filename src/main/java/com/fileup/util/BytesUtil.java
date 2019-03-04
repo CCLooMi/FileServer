@@ -57,45 +57,25 @@ public class BytesUtil {
 		int l=(hex.length()+1)/2;
 		byte[]bytes=new byte[l];
 		for(int i=0,j=0;i<hex.length();i++) {
-			if(i%2==0) {
-				switch (hex.charAt(i)) {
-				case '1':bytes[j]|=0x10;break;
-				case '2':bytes[j]|=0x20;break;
-				case '3':bytes[j]|=0x30;break;
-				case '4':bytes[j]|=0x40;break;
-				case '5':bytes[j]|=0x50;break;
-				case '6':bytes[j]|=0x60;break;
-				case '7':bytes[j]|=0x70;break;
-				case '8':bytes[j]|=0x80;break;
-				case '9':bytes[j]|=0x90;break;
-				case 'a':case 'A':bytes[j]|=0xA0;break;
-				case 'b':case 'B':bytes[j]|=0xB0;break;
-				case 'c':case 'C':bytes[j]|=0xC0;break;
-				case 'd':case 'D':bytes[j]|=0xD0;break;
-				case 'e':case 'E':bytes[j]|=0xE0;break;
-				case 'f':case 'F':bytes[j]|=0xF0;break;
-				default:break;
-				}
-			}else {
-				switch (hex.charAt(i)) {
-				case '1':bytes[j++]|=0x01;break;
-				case '2':bytes[j++]|=0x02;break;
-				case '3':bytes[j++]|=0x03;break;
-				case '4':bytes[j++]|=0x04;break;
-				case '5':bytes[j++]|=0x05;break;
-				case '6':bytes[j++]|=0x06;break;
-				case '7':bytes[j++]|=0x07;break;
-				case '8':bytes[j++]|=0x08;break;
-				case '9':bytes[j++]|=0x09;break;
-				case 'a':case 'A':bytes[j++]|=0x0A;break;
-				case 'b':case 'B':bytes[j++]|=0x0B;break;
-				case 'c':case 'C':bytes[j++]|=0x0C;break;
-				case 'd':case 'D':bytes[j++]|=0x0D;break;
-				case 'e':case 'E':bytes[j++]|=0x0E;break;
-				case 'f':case 'F':bytes[j++]|=0x0F;break;
-				default:j++;break;
-				}
+			switch (hex.charAt(i)) {
+			case '1':bytes[j]|=0x01;break;
+			case '2':bytes[j]|=0x02;break;
+			case '3':bytes[j]|=0x03;break;
+			case '4':bytes[j]|=0x04;break;
+			case '5':bytes[j]|=0x05;break;
+			case '6':bytes[j]|=0x06;break;
+			case '7':bytes[j]|=0x07;break;
+			case '8':bytes[j]|=0x08;break;
+			case '9':bytes[j]|=0x09;break;
+			case 'a':case 'A':bytes[j]|=0x0A;break;
+			case 'b':case 'B':bytes[j]|=0x0B;break;
+			case 'c':case 'C':bytes[j]|=0x0C;break;
+			case 'd':case 'D':bytes[j]|=0x0D;break;
+			case 'e':case 'E':bytes[j]|=0x0E;break;
+			case 'f':case 'F':bytes[j]|=0x0F;break;
+			default:break;
 			}
+			j+=i&1;
 		}
 		return bytes;
 	}
