@@ -13,9 +13,9 @@ allprojects {
 	}
 }
 dependencies {
-        def jacksonVersion			= "2.+"
-		def logbackVersion		= "1.2.+"
-		def slf4jVersion				= "1.7.+"
+        def jacksonVersion			= "2.9.8"
+		def logbackVersion		= "1.2.3"
+		def slf4jVersion				= "1.7.26"
 		def springBootVersion	= "2.+"
     compile (
 		["ch.qos.logback:logback-access:$logbackVersion"],
@@ -25,11 +25,11 @@ dependencies {
 		["org.slf4j:slf4j-api:$slf4jVersion"],
 		["org.rocksdb:rocksdbjni:5.17.2"],
 		["org.springframework.boot:spring-boot-starter-web:$springBootVersion"],
-		["org.xerial.snappy:snappy-java:1.+"],
+		["org.xerial.snappy:snappy-java:1.1.7.2"],
 		["com.fasterxml.jackson.core:jackson-core:$jacksonVersion"],
 		["com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"],
 		["com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"],
-		["io.netty:netty-all:4.+"],
+		["io.netty:netty-all:4.1.9.Final"],
     		fileTree(dir: 'libs', include: '*.jar'))
     testCompile(["junit:junit:4.+"])
 }
