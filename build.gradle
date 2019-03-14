@@ -33,7 +33,29 @@ dependencies {
     		fileTree(dir: 'libs', include: '*.jar'))
     testCompile(["junit:junit:4.+"])
 }
-
+//打包源代码
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+artifacts {
+    archives sourcesJar
+}
+tasks.withType(JavaCompile) {  
+	options.encoding = "UTF-8"  
+}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "$mvnRelease") {
+                authentication(userName: "admin", password: "admin123")
+            }
+            pom.version = "$project.version"
+            pom.artifactId = "$artifactId"
+            pom.groupId = "$project.group"
+        }
+    }
+}
 jar {
     String classPath = ''
     configurations.runtime.each {classPath += " lib//"+it.name}
