@@ -59,6 +59,7 @@
         };
         reader.readAsArrayBuffer(file.slice(block.start, block.end));
     }
+    var selfPath=getMyPath();
     function getMyPath(){
     	var ss=document.getElementsByTagName('script');
         var s = ss[ss.length -1].src;
@@ -74,7 +75,7 @@
                 return ele.src;
             }
         }else{
-        	return getMyPath()+"/md5Worker.min.js";
+        	return selfPath+"/md5Worker.min.js";
         }
     }
 
