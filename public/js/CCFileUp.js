@@ -59,14 +59,22 @@
         };
         reader.readAsArrayBuffer(file.slice(block.start, block.end));
     }
-
+    function getMyPath(){
+    	var ss=document.getElementsByTagName('script');
+        var s = ss[ss.length -1].src;
+        return s.substr(0,s.lastIndexOf('/'));
+    }
     function ele2url(id) {
         var ele = document.getElementById(id);
-        if ('' != ele.innerText.trim()) {
-            var blob = new Blob([ele.innerText], {type: ele.type});
-            return window.URL.createObjectURL(blob);
-        } else {
-            return ele.src;
+        if(ele){
+        	if ('' != ele.innerText.trim()) {
+                var blob = new Blob([ele.innerText], {type: ele.type});
+                return window.URL.createObjectURL(blob);
+            } else {
+                return ele.src;
+            }
+        }else{
+        	return getMyPath()+"/md5Worker.min.js";
         }
     }
 
