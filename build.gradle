@@ -5,17 +5,20 @@ def artifactId='fileServer'
 apply plugin: 'java'
 apply plugin: 'maven'
 
+def mvnLocal  ='http://localhost:8081/repository/maven-central/'
+def mvnRelease='http://localhost:8081/repository/maven-releases/'
 allprojects {
 	repositories {
-		maven{url='http://localhost:8081/repository/alimaven-central/'}
-		maven{url="http://maven.aliyun.com/nexus/content/groups/public/"}
-		mavenCentral()
+		//maven{url='https://maven.aliyun.com/nexus/content/groups/public/'}
+		maven{url="$mvnLocal"}
+		maven{url="$mvnRelease"}
+		//mavenCentral()
 	}
 }
 dependencies {
-        def jacksonVersion			= "2.9.8"
+        def jacksonVersion		= "2.9.8"
 		def logbackVersion		= "1.2.3"
-		def slf4jVersion				= "1.7.26"
+		def slf4jVersion		= "1.7.26"
 		def springBootVersion	= "2.+"
     compile (
 		["ch.qos.logback:logback-access:$logbackVersion"],
