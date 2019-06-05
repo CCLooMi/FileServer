@@ -133,7 +133,6 @@
             .replace('http:', 'ws:')
             .replace('https:', 'wss:') + 'ws';
         try {
-            console.clear();
             console.log('Connecting socket to [ ' + this.uploadWSurl + ' ]');
             var socket = new WebSocket(this.uploadWSurl);
             socket.onopen = function () {
@@ -188,6 +187,12 @@
             file.worker = worker;
             file.step = 1;
             worker.addEventListener('message', function (e) {
+                if(file.stopHash){
+                    file.worker.terminate();
+                    this.hashStopped&&this.hashStopped();
+                    $this.hashNexFile();
+                    return;
+                }
                 var d = e.data;
                 var block = d.block;
                 if (d.firstHash) {
@@ -255,23 +260,30 @@
              then we need put the file into filesToUpload again*/
             socket.file = file;
             socket.onmessage = function (event) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    var command = btx.convertToObject(reader.result);
-                    if (command.hd == 1) {
-                        file.progress = command.completePercent / 100000000;
-                        file.onProcess();
-                        readFileByCommand(file, command);
-                    } else if (command.hd == 3) {
-                        delete file.socket;
-                        delete socket.file;
-                        file.progress = 1;
-                        file.onProcess();
-                        file.uploadComplete&&file.uploadComplete();
-                        $this.uploadNextFile(socket);
+                if(!file.stopUpload){
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var command = btx.convertToObject(reader.result);
+                        if (command.hd == 1) {
+                            file.progress = command.completePercent / 100000000;
+                            file.onProcess();
+                            readFileByCommand(file, command);
+                        } else if (command.hd == 3) {
+                            delete file.socket;
+                            delete socket.file;
+                            file.progress = 1;
+                            file.onProcess();
+                            file.uploadComplete&&file.uploadComplete();
+                            $this.uploadNextFile(socket);
+                        }
                     }
+                    reader.readAsArrayBuffer(event.data);
+                }else{
+                    delete file.socket;
+                    delete socket.file;
+                    this.uploadStopped&&this.uploadStopped();
+                    $this.uploadNextFile(socket);
                 }
-                reader.readAsArrayBuffer(event.data);
             }
             if (socket.readyState == WebSocket.OPEN) {
                 var fi = {
@@ -304,6 +316,21 @@
         addFiles:function (files) {
             var $this=this;
             for(var i=0;i<files.length;i++){
+                files[i].remove=function(){
+                    var idx=$this.filesToHash.indexOf(this);
+                    if(idx>-1){
+                        $this.filesToHash.splice(idx,1);
+                    }else if(this.step==1){
+                        this.stopHash=true;
+                    }else{
+                        idx=$this.filesToUpload.indexOf(this);
+                        if(idx>-1){
+                            $this.filesToUpload.splice(idx,1);
+                        }else if(this.step==2){
+                            this.stopUpload=true;
+                        }
+                    }
+                }
                 files[i].onHashComplete=function(){
                     $this.workers--;
                     this.hashComplete&&this.hashComplete();
