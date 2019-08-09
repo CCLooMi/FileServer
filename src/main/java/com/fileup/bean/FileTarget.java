@@ -90,7 +90,7 @@ public class FileTarget implements CommandType{
 	public static boolean fileExist(String id,String suffix) {
 		return fileWithEnd(id, suffix, "").exists();
 	}
-	private static String getFilePath(String id) {
+	public static String getFilePath(String id) {
 		long v1=StringUtil.strtol(id.substring(0, 3), 16);
 		long v2=StringUtil.strtol(id.substring(3, 6), 16);
 		return "/"+v1/4+"/"+v2/4+"/"+id+"/";
@@ -175,7 +175,7 @@ public class FileTarget implements CommandType{
 			e.printStackTrace();
 		}
 	}
-	private static File fileWithEnd(String id,String suffix,String end) {
+	public static File fileWithEnd(String id,String suffix,String end) {
 		File file=null;
 		String savePath=Config.getConfig("server.file.save.path","upload");
 		if(Config.decktopWindow) {
