@@ -15,6 +15,8 @@ import com.fileup.util.Paths;
 import com.fileup.util.RocksDbUtil;
 import com.fileup.util.StringUtil;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  * © 2015-2019 Chenxj Copyright
  * 类    名：FileTarget
@@ -115,8 +117,14 @@ public class FileTarget implements CommandType{
 		return this;
 	}
 	public FileTarget commandComplete(UploadCommand command,byte[]data) {
+		return commandComplete(command, ByteBuffer.wrap(data));
+	}
+	public FileTarget commandComplete(UploadCommand command,ByteBuf data) {
+		return commandComplete(command, data.nioBuffer());
+	}
+	public FileTarget commandComplete(UploadCommand command,ByteBuffer data) {
 		try {
-			this.fc.write(ByteBuffer.wrap(data),command.getIndexStart());
+			this.fc.write(data,command.getIndexStart());
 			addCompleteFileSize(command.blobSize());
 			this.bSet.setBit(command.getIndex());
 		} catch (Exception e) {

@@ -54,9 +54,8 @@ implements CommandType{
 		case UPLOAD_DATA:
 			ft=ftm.get(command.getId());
 			if(ft!=null) {
-				bs=new byte[buf.readableBytes()-1];
-				buf.getBytes(1, bs);
-				ft.commandComplete(command,bs);
+				buf.readByte();
+				ft.commandComplete(command,buf);
 				ft.nextUploadCommand(this.command);
 				ctx.channel().writeAndFlush(command.toBinaryWebSocketFrame());
 			}
