@@ -27,15 +27,12 @@ implements CommandType{
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame msg) throws Exception {
 		FileTarget ft=null;
-		byte[]bs=null;
 		ByteBuf buf=msg.content();
 		switch (buf.getByte(0)) {
 		case UPLOAD_FILE:
 			//有未完成的command需要先cancel
 			this.cancelCommand();
-			bs=new byte[buf.readableBytes()];
-			buf.readBytes(bs);
-			Map<String, Object>m=BtxUtil.btx().convertToMap(bs);
+			Map<String, Object>m=BtxUtil.btx().convertToMap(buf.nioBuffer());
 			if(FileTarget.fileExist((String)m.get("id"),(String)m.get("suffix"))) {
 				ctx.channel().writeAndFlush(FileTarget
 						.commandSuccess()
@@ -54,7 +51,7 @@ implements CommandType{
 		case UPLOAD_DATA:
 			ft=ftm.get(command.getId());
 			if(ft!=null) {
-				buf.readByte();
+				buf.readByte();//跳过第一个字节
 				ft.commandComplete(command,buf);
 				ft.nextUploadCommand(this.command);
 				ctx.channel().writeAndFlush(command.toBinaryWebSocketFrame());
