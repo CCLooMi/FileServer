@@ -1,6 +1,17 @@
 /**
  * Created by Chenxj on 2016/1/12.
  */
+
+let csm=[];
+(function () {
+    var cs="0123456789abcdef";
+    var n=0;
+    for(var i=0;i<16;i++){
+        for(var j=0;j<16;j++,n++){
+            csm[n]=cs[i]+cs[j];
+        }
+    }
+})();
 function rotl(a, b) {
     return a << b | a >>> 32 - b
 }
@@ -17,10 +28,11 @@ function endian(a) {
     return a
 }
 function bytesToHex(a) {
-    for (var b = [], c = 0; c < a.length; c++) {
-        b.push((a[c] >>> 4).toString(16)), b.push((a[c] & 15).toString(16));
+    var s='';
+    for(var i=0;i<a.length;i++){
+        s+=csm[a[i]&0xff];
     }
-    return b.join("")
+    return s;
 }
 function bytesToWords(a) {
     for (var b = [], c = 0, d = 0; c < a.length; c++, d += 8) {

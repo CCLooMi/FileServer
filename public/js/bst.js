@@ -275,8 +275,11 @@
             "U8": function (a) {
                 return intArrayToString(a);
             },
-            "HEX": function (a) {
+            "Hex": function (a) {
                 return bytesToHex(a);
+            },
+            "HEX": function (a) {
+                return bytesToHEX(a);
             }
         }, this.options.fromLib);
         this.toLib = Object.assign({
@@ -285,6 +288,9 @@
             },
             "U8": function (s) {
                 return stringToIntArray(s);
+            },
+            "Hex": function (s) {
+                return hexToBytes(s);
             },
             "HEX": function (s) {
                 return hexToBytes(s);
@@ -644,7 +650,7 @@
             return [];
         },
         doConvert: function (bitem, dv, rs, revert) {
-            if (bitem.L) {
+            if (bitem.L != undefined) {
                 switch (bitem.type) {
                     case 'SEPARATOR':
                         if (revert) {
@@ -1106,15 +1112,18 @@
     }
 
     var csm=[];
-    (function (csm) {
+    var CSM=[];
+    (function () {
         var cs="0123456789abcdef";
+        var CS="0123456789ABCDEF";
         var n=0;
         for(var i=0;i<16;i++){
-            for(var j=0;j<16;j++){
-                csm[n++]=cs[i]+cs[j];
+            for(var j=0;j<16;j++,n++){
+                csm[n]=cs[i]+cs[j];
+                CSM[n]=CS[i]+CS[j];
             }
         }
-    })(csm);
+    })();
     function bytesToHex(a) {
         var s='';
         for(var i=0;i<a.length;i++){
@@ -1122,11 +1131,17 @@
         }
         return s;
     }
-    function hexToBytes(hex) {
-        var bytes=[];
-        for(var i=0,j=0;i<hex.length;i++) {
-            switch (hex[i]) {
-                case '0':bytes[j]|=0x00>>((i&1)<<2);break;
+    function bytesToHEX(a) {
+        var s='';
+        for(var i=0;i<a.length;i++){
+            s+=CSM[a[i]&0xff];
+        }
+        return s;
+    }
+    function hexToBytes(hex){
+        let bytes=[];
+        for(let i=0,j=0;i<hex.length();i++) {
+            switch (hex.charAt(i)) {
                 case '1':bytes[j]|=0x10>>((i&1)<<2);break;
                 case '2':bytes[j]|=0x20>>((i&1)<<2);break;
                 case '3':bytes[j]|=0x30>>((i&1)<<2);break;

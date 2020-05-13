@@ -61,16 +61,24 @@
     }
     var selfPath=getMyPath();
     function getMyPath(){
-    	var ss=document.getElementsByTagName('script');
-        var s = ss[ss.length -1].src;
-        return s.substr(0,s.lastIndexOf('/'));
+    	var ss=document.currentScript||document.querySelector("script[src*='CCFileUp']");
+    	if(ss){
+    		var s=ss.src;
+            return s.substr(0,s.lastIndexOf('/'));
+    	}else{
+    		return '';
+    	}
     }
     function ele2url(id) {
         var ele = document.getElementById(id);
         if(ele){
         	if ('' != ele.innerText.trim()) {
+        		if(ele.bsrc){
+        			return ele.bsrc;
+        		}
                 var blob = new Blob([ele.innerText], {type: ele.type});
-                return window.URL.createObjectURL(blob);
+                ele.bsrc=window.URL.createObjectURL(blob);
+                return ele.bsrc;
             } else {
                 return ele.src;
             }
@@ -83,7 +91,7 @@
         return new Worker(ele2url(id));
     }
 
-    var btx = new CCBitsyntax("hd:1/I,(hd){0:{id:16/HEX,size:8/I,suffix:/U8,'#',type/U8,'#',name/U8},1:{indexStart:8/I,indexEnd:8/I,completePercent:4/I},2:{data/AB}}",
+    var btx = new CCBitsyntax("hd:1/I,(hd){0:{id:16/Hex,size:8/I,suffix:/U8,'#',type/U8,'#',name/U8},1:{indexStart:8/I,indexEnd:8/I,completePercent:4/I},2:{data/AB}}",
         {
             fromLib: {
                 CCID: function (a) {
