@@ -25,27 +25,27 @@
         }
         return r;
     };
-    var csm2 = [];
-    var start = 0x0100;
-    for (var i = start, j = 0; i < start + 256; i++) {
-        csm2[j++] = String.fromCharCode(i);
-    }
 
-    function bytesToCCString(a) {
-        var s = '';
-        for (var i = 0; i < a.length; i++) {
-            s += csm2[a[i]];
+    let bytesToHex;
+    (function () {
+        let csm=[];
+        (function () {
+            var cs="0123456789abcdef";
+            var n=0;
+            for(var i=0;i<16;i++){
+                for(var j=0;j<16;j++,n++){
+                    csm[n]=cs[i]+cs[j];
+                }
+            }
+        })();
+        bytesToHex=function (a) {
+            var s='';
+            for(var i=0;i<a.length;i++){
+                s+=csm[a[i]&0xff];
+            }
+            return s;
         }
-        return s;
-    }
-
-    function ccStringToBytes(a) {
-        var b = [];
-        for (var i = 0; i < a.length; i++) {
-            b.push(a.charCodeAt(i) - start);
-        }
-        return b;
-    }
+    })();
 
     function readFile(file, block) {
         var reader = new FileReader();
@@ -93,15 +93,8 @@
 
     var btx = new CCBitsyntax("hd:1/I,(hd){0:{id:16/Hex,size:8/I,suffix:/U8,'#',type/U8,'#',name/U8},1:{indexStart:8/I,indexEnd:8/I,completePercent:4/I},2:{data/AB}}",
         {
-            fromLib: {
-                CCID: function (a) {
-                    return bytesToCCString(a);
-                }
-            },
+            fromLib: {},
             toLib: {
-                CCID: function (s) {
-                    return ccStringToBytes(s);
-                },
                 AB: function (buff) {
                     var a = new Uint8Array(buff);
                     var r = [];
@@ -125,7 +118,7 @@
     function readFileHead(file, callback) {
         var reader = new FileReader();
         reader.onload = function (e) {
-            file.head = bytesToCCString(new Uint8Array(reader.result));
+            file.head = bytesToHex(new Uint8Array(reader.result));
             callback && callback(file);
         }
         reader.readAsArrayBuffer(file.slice(0, 20));
