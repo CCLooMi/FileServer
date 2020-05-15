@@ -1140,7 +1140,7 @@
     }
     function hexToBytes(hex){
         let bytes=[];
-        for(let i=0,j=0;i<hex.length();i++) {
+        for(let i=0,j=0;i<hex.length;i++) {
             switch (hex.charAt(i)) {
                 case '1':bytes[j]|=0x10>>((i&1)<<2);break;
                 case '2':bytes[j]|=0x20>>((i&1)<<2);break;
